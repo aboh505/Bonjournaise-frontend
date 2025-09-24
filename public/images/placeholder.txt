@@ -1,0 +1,19 @@
+Ce dossier contient les images pour l'application SaveursDuKmer.
+
+Les images suivantes devraient être ajoutées pour un fonctionnement optimal :
+- hero-background.jpg : image d'arrière-plan pour la page d'accueil
+- default-avatar.jpg : image par défaut pour les utilisateurs sans photo de profil
+- default-recipe.jpg : image par défaut pour les recettes sans photo
+- ndole.jpg : image de la recette de ndolé
+- poulet-dg.jpg : image de la recette de poulet DG
+- eru.jpg : image de la recette d'eru
+- koki.jpg : image de la recette de koki
+- mbongo-tchobi.jpg : image de la recette de mbongo tchobi
+- sanga.jpg : image de la recette de sanga
+- kondre.jpg : image de la recette de kondre
+- pile.jpg : image de la recette de pilé
+- taro.jpg : image de la recette de taro sauce jaune
+- cameroun-cuisine.jpg : image pour la catégorie cuisine camerounaise
+- vegetarien.jpg : image pour la catégorie végétarien
+- facile.jpg : image pour la catégorie facile
+- rapide.jpg : image pour la catégorie rapide
