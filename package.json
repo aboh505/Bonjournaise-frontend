@@ -3,12 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
+    "dev:turbo": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@next/font": "^14.2.15",
     "axios": "^1.12.2",
     "framer-motion": "^12.23.21",
     "jwt-decode": "^4.0.0",

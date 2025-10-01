@@ -307,12 +307,15 @@ export default function AddRecipePage() {
       // Si une photo est présente, l'envoyer
       if (photoFile) {
         try {
+          console.log('Tentative d\'upload de la photo:', photoFile.name, 'pour la recette ID:', recetteId);
           const formDataObj = new FormData();
           formDataObj.append('file', photoFile);
-          await recettesApi.uploadPhoto(recetteId, formDataObj);
-          console.log('Photo téléchargée avec succès');
+          const photoResponse = await recettesApi.uploadPhoto(recetteId, formDataObj);
+          console.log('Photo téléchargée avec succès, réponse du serveur:', photoResponse.data);
+          toast.success('Photo de la recette téléchargée avec succès');
         } catch (photoError) {
           console.error('Erreur lors du téléchargement de la photo:', photoError);
+          console.error('Détails de l\'erreur:', photoError.response?.data || photoError.message);
           // Ne pas bloquer le processus si l'upload de la photo échoue
           toast.error("La recette a été créée mais l'upload de la photo a échoué");
         }

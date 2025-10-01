@@ -8,6 +8,7 @@ import { FiClock, FiHeart, FiUser } from 'react-icons/fi';
 import StarRating from './StarRating';
 import SafeImage from './SafeImage';
 import toast from 'react-hot-toast';
+import { getRecipeImageUrl } from '../utils/imageUtils';
 
 const RecipeCard = ({ recipe, isStatic = false }) => {
   const [isFavorite, setIsFavorite] = useState(recipe.isFavorite || false);
@@ -45,14 +46,32 @@ const RecipeCard = ({ recipe, isStatic = false }) => {
     <>
       <div className="relative">
         <div className="aspect-w-16 aspect-h-9 relative h-48">
-          <SafeImage
-            src={recipe.photo ? `http://localhost:5000/uploads/${recipe.photo}` : recipe.image || '/images/default-recipe.svg'}
-            fallbackSrc="/images/default-recipe.svg"
-            alt={recipe.titre}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 33vw"
-          />
+          <div className="w-full h-full">
+            {/* Si nous avons une URL d'image valide, utiliser SafeImage */}
+            {getRecipeImageUrl(recipe.photo) ? (
+              <SafeImage
+                src={getRecipeImageUrl(recipe.photo)}
+                alt={recipe.titre}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 33vw"
+              />
+            ) : recipe.image && recipe.image.startsWith('/') ? (
+              /* Si nous avons une image locale statique */
+              <Image
+                src={recipe.image}
+                alt={recipe.titre}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 33vw"
+              />
+            ) : (
+              /* Si nous n'avons pas d'image, afficher un placeholder */
+              <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                <span className="text-gray-400 text-sm font-medium">Aucune image</span>
+              </div>
+            )}
+          </div>
         </div>
         <button
           onClick={handleFavoriteToggle}

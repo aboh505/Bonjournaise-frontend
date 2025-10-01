@@ -10,26 +10,13 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-          <h3 className="text-3xl font-serif italic font-bold text-white">🍲
-              La<span className="text-amber-200">Bonjournaise</span>
+          <h3 className="text-2xl font-serif italic font-bold text-white tracking-wide">
+          𝓛𝓪 <span className="text-amber-200">𝓑𝓸𝓷𝓳𝓸𝓾𝓻𝓷𝓪𝓲𝓼𝓮 </span>
             </h3>
             <p className="mb-4">
               Découvrez et partagez les meilleures recettes de cuisine camerounaise et africaine.
             </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-gray-300 hover:text-pink-500 transition-colors">
-                <FiInstagram size={20} />
-              </a>
-              <a href="#" className="text-gray-300 hover:text-blue-700 transition-colors">
-                <FiFacebook size={20} />
-              </a>
-              <a href="#" className="text-gray-300 hover:text-blue-400 transition-colors">
-                <FiTwitter size={20} />
-              </a>
-              <a href="#" className="text-gray-300 hover:text-red-500 transition-colors">
-                <FiYoutube size={20} />
-              </a>
-            </div>
+           
           </div>
 
           <div>
@@ -104,19 +91,9 @@ const Footer = () => {
             <h4 className="text-lg font-semibold mb-4">Aide & Contact</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/a-propos">
-                  <span className="text-gray-300 hover:text-amber-500 transition-colors">
-                    À propos de nous
-                  </span>
-                </Link>
+               
               </li>
-              <li>
-                <Link href="/contact">
-                  <span className="text-gray-300 hover:text-amber-500 transition-colors">
-                    Contact
-                  </span>
-                </Link>
-              </li>
+             
               <li>
                 <Link href="/confidentialite">
                   <span className="text-gray-300 hover:text-amber-500 transition-colors">
@@ -136,7 +113,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
-          <p>© {currentYear} SaveursDuKmer - Tous droits réservés</p>
+          <p>© {currentYear} LaBonjournaise - Tous droits réservés</p>
           <div className="mt-4 md:mt-0">
             Développé avec ❤️ pour la cuisine camerounaise
           </div>

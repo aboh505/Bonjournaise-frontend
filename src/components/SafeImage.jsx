@@ -2,49 +2,69 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { isValidImageUrl } from '../utils/imageUtils';
 
-// Fonction pour vérifier si une URL est valide
-const isValidImageUrl = (url) => {
-  if (!url || typeof url !== 'string') return false;
-  
-  try {
-    // Vérifier si l'URL est relative (commence par '/')
-    if (url.startsWith('/')) return true;
-    
-    // Vérifier si c'est une URL absolue valide
-    new URL(url);
-    return true;
-  } catch (e) {
-    return false;
-  }
-};
+// La fonction isValidImageUrl est maintenant importée depuis imageUtils
 
-// Ce composant gère les images avec un fallback en cas d'erreur de chargement ou d'URL invalide
-const SafeImage = ({ src, alt, fill = false, className = "", fallbackSrc = "/images/default-placeholder.jpg", ...props }) => {
+// Ce composant gère les images avec une gestion des erreurs
+const SafeImage = ({ src, alt, fill = false, className = "", ...props }) => {
   const [error, setError] = useState(false);
-  const [validatedSrc, setValidatedSrc] = useState(fallbackSrc);
+  const [validatedSrc, setValidatedSrc] = useState(null);
   
   // Valider l'URL de l'image à chaque changement de source
   useEffect(() => {
-    if (isValidImageUrl(src)) {
-      setValidatedSrc(src);
-      setError(false);
-    } else {
-      setValidatedSrc(fallbackSrc);
+    // Réinitialiser les états
+    setError(false);
+    
+    // Vérifier si la source est valide
+    if (!src) {
+      setError(true);
+      return;
+    }
+
+    // Vérifier si c'est une URL valide pour Next.js Image
+    try {
+      if (isValidImageUrl(src)) {
+        setValidatedSrc(src);
+      } else {
+        // Si l'URL n'est pas valide pour Next.js, on utilise une image par défaut
+        setError(true);
+      }
+    } catch (e) {
+      // En cas d'erreur, marquer comme erreur
       setError(true);
     }
-  }, [src, fallbackSrc]);
+  }, [src]);
   
-  return (
-    <Image
-      src={error ? fallbackSrc : validatedSrc}
-      alt={alt || 'Image'}
-      fill={fill}
-      className={className}
-      onError={() => setError(true)}
-      {...props}
-    />
-  );
+  // Si on a une erreur, on ne rend rien
+  if (error) {
+    return null;
+  }
+  
+  // Protection supplémentaire pour s'assurer que l'URL est bien valide
+  try {
+    // Pour les URLs absolues, vérifions qu'elles sont bien construites
+    if (validatedSrc.startsWith('http')) {
+      new URL(validatedSrc);
+    }
+    
+    // Sinon, on rend l'image
+    return (
+      <Image
+        src={validatedSrc}
+        alt={alt || 'Image'}
+        fill={fill}
+        className={className}
+        onError={() => {
+          setError(true);
+        }}
+        {...props}
+      />
+    );
+  } catch (e) {
+    // Si l'URL est invalide, ne rien afficher
+    return null;
+  }
 };
 
 export default SafeImage;

@@ -155,11 +155,31 @@ export default function ProfilePage() {
         email: profileData.email
       });
       
-      // Temporairement désactivé la mise à jour de la photo
+      // Mise à jour de la photo de profil si une nouvelle photo a été sélectionnée
       if (success && profileData.photo) {
-        console.log('Photo de profil disponible, mais la mise à jour est temporairement désactivée');
-        // Pour la démo, nous gardons l'aperçu de la photo localement
-        toast("La mise à jour de la photo sera disponible dans une future mise à jour");
+        console.log('Mise à jour de la photo de profil');
+        try {
+          // Créer un objet FormData pour l'upload de la photo
+          const formData = new FormData();
+          formData.append('file', profileData.photo);
+          
+          // Appel à l'API pour télécharger la photo
+          await authApi.updateProfilePhoto(formData);
+          
+          // Force le rechargement du profil utilisateur pour afficher la nouvelle photo
+          const updatedProfile = await authApi.getProfile();
+          if (updatedProfile?.data?.data) {
+            // Mettre à jour l'objet utilisateur dans localStorage
+            localStorage.setItem('user', JSON.stringify(updatedProfile.data.data));
+          }
+          
+          // Actualiser la page pour afficher la nouvelle photo
+          window.location.reload();
+          toast.success("Photo de profil mise à jour avec succès !");
+        } catch (photoError) {
+          console.error('Erreur lors de la mise à jour de la photo de profil:', photoError);
+          toast.error("Erreur lors de la mise à jour de la photo de profil");
+        }
       }
       
       toast.success("Profil mis à jour avec succès !");
@@ -213,14 +233,25 @@ export default function ProfilePage() {
           <div className="md:w-1/4">
             <div className="relative">
               <div className="h-40 w-40 mx-auto rounded-full overflow-hidden border-4 border-amber-100 dark:border-amber-900">
-                <SafeImage
-                  src={previewImage || user.photo || "/images/default-avatar.svg"}
-                  fallbackSrc="/images/default-avatar.svg"
-                  alt={`${user.prenom} ${user.nom}`}
-                  width={160}
-                  height={160}
-                  className="object-cover"
-                />
+                {/* Si nous avons une image, l'afficher avec SafeImage */}
+                {(previewImage || user.photo) ? (
+                  <SafeImage
+                    src={previewImage || user.photo}
+                    alt={`${user.prenom} ${user.nom}`}
+                    width={160}
+                    height={160}
+                    className="object-cover"
+                  />
+                ) : (
+                  /* Sinon, utiliser l'image par défaut avec Image standard */
+                  <Image
+                    src="/images/default-avatar.svg"
+                    alt={`${user.prenom} ${user.nom}`}
+                    width={160}
+                    height={160}
+                    className="object-cover"
+                  />
+                )}
               </div>
               {isEditing && (
                 <label

@@ -40,7 +40,7 @@ const Navbar = () => {
   const navLinks = [
     { name: 'Accueil', path: '/' },
     { name: 'Recettes', path: '/recettes' },
-   
+    // { name: 'Contact', path: '/contact' },
   ];
 
   return (
@@ -50,8 +50,8 @@ const Navbar = () => {
           {/* Logo */}
           <Link href="/">
             {/* Texte principal */}
-            <span className="text-3xl font-serif italic font-bold text-white">🍲
-              La<span className="text-amber-200">Bonjournaise</span>
+            <span className="text-4xl font-serif italic font-bold text-white tracking-wide">
+              𝓛𝓪 <span className="text-amber-200">𝓑𝓸𝓷𝓳𝓸𝓾𝓻𝓷𝓪𝓲𝓼𝓮 </span>
             </span>
           </Link>
 
@@ -73,11 +73,7 @@ const Navbar = () => {
                     <FiUser className="mr-1" /> {user?.prenom || 'Profil'}
                   </span>
                 </Link>
-                <Link href="/profil?tab=favoris">
-                  <span className="flex items-center text-amber-100">
-                    <FiHeart className="mr-1" /> Favoris
-                  </span>
-                </Link>
+
                 <button
                   onClick={handleLogout}
                   className="flex items-center text-amber-100 bg-amber-800 px-3 py-1 rounded-md"
@@ -141,14 +137,7 @@ const Navbar = () => {
                       <FiUser className="mr-2" /> {user?.prenom || 'Profil'}
                     </span>
                   </Link>
-                  <Link href="/profil?tab=favoris">
-                    <span
-                      className="flex items-center text-gray-700 dark:text-gray-300"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <FiHeart className="mr-2" /> Favoris
-                    </span>
-                  </Link>
+
                   <button
                     onClick={() => {
                       handleLogout();

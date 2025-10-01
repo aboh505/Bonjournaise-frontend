@@ -3,13 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { FiArrowLeft, FiClock, FiHeart, FiUser, FiEdit, FiMessageCircle, FiChevronRight } from 'react-icons/fi';
+import { FiArrowLeft, FiClock, FiHeart, FiUser, FiEdit, FiMessageCircle, FiChevronRight, FiChevronDown, FiChevronUp, FiEye, FiEyeOff } from 'react-icons/fi';
 import StarRating from '../../../components/StarRating';
 import SafeImage from '../../../components/SafeImage';
 import { recettesApi, commentairesApi } from '../../../utils/api';
 import { useAuth } from '../../../context/AuthContext';
+import { getRecipeImageUrl } from '../../../utils/imageUtils';
 
 // Composant pour afficher un commentaire
 const CommentItem = ({ comment, isCurrentUser, onDelete, onEdit }) => {
@@ -113,6 +115,7 @@ export default function RecipeDetail() {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [showComments, setShowComments] = useState(true);
 
   // Charger les détails de la recette et les commentaires
   useEffect(() => {
@@ -144,13 +147,17 @@ export default function RecipeDetail() {
         try {
           // Utiliser l'ID valide pour MongoDB
           const recipeResponse = await recettesApi.getById(recipeId);
-          console.log('Réponse de l\'API:', recipeResponse.data ? 'Succès' : 'Pas de données');
-          console.log('Structure complète de la recette:', JSON.stringify(recipeResponse.data, null, 2));
-          console.log('Ingrédients:', recipeResponse.data?.ingredients);
-          console.log('Instructions:', recipeResponse.data?.etapes);
-          console.log('Image URL:', recipeResponse.data?.photo || recipeResponse.data?.image);
           
-          recipeData = recipeResponse.data;
+          // Vérifier si les données sont dans data.data (format API) ou directement dans data
+          if (recipeResponse.data) {
+            // Vérifions si les données sont dans recipeResponse.data.data
+            if (recipeResponse.data.data) {
+              recipeData = recipeResponse.data.data;
+            } else if (recipeResponse.data.success !== false) {
+              // Sinon utiliser directement recipeResponse.data
+              recipeData = recipeResponse.data;
+            }
+          }
           
           // Récupérer les commentaires
           const commentsResponse = await commentairesApi.getByRecette(recipeId);
@@ -171,86 +178,16 @@ export default function RecipeDetail() {
           setRecipe(recipeData);
           setComments(commentsData);
           
-          // Vérifier si la recette est dans les favoris (si l'utilisateur est connecté)
           if (isLoggedIn) {
             setIsFavorite(recipeData.isFavorite || false);
             setUserRating(recipeData.userRating || 0);
           }
         } else {
-          // Aucune donnée récupérée, utiliser les données de fallback
-          const fallbackRecipe = {
-            _id: id,
-            titre: "Ndolé (Fallback)",
-            description: "Le Ndolé est un plat traditionnel camerounais à base de feuilles amères, de pâte d'arachide et de viande ou de poisson. C'est l'un des plats nationaux du Cameroun, très apprécié pour ses saveurs riches et sa texture crémeuse.",
-            image: "/images/ndole.jpg",
-            ingredients: [
-              { nom: "Feuilles de ndolé", quantite: "500", unite: "g" },
-              { nom: "Pâte d'arachide", quantite: "200", unite: "g" },
-              { nom: "Viande de bœuf", quantite: "400", unite: "g" },
-              { nom: "Crevettes séchées", quantite: "100", unite: "g" },
-              { nom: "Oignons", quantite: "2", unite: "" },
-              { nom: "Ail", quantite: "3", unite: "gousses" },
-              { nom: "Huile végétale", quantite: "4", unite: "cuillères à soupe" },
-              { nom: "Sel et poivre", quantite: "", unite: "au goût" },
-              { nom: "Piment (facultatif)", quantite: "1", unite: "" }
-            ],
-            etapes: [
-              "Laver soigneusement les feuilles de ndolé et les faire bouillir pendant 30 minutes pour éliminer l'amertume.",
-              "Égoutter les feuilles et les hacher finement.",
-              "Couper la viande en morceaux et la faire revenir dans l'huile jusqu'à ce qu'elle soit dorée.",
-              "Ajouter les oignons émincés et l'ail haché, puis faire revenir 2 minutes.",
-              "Incorporer la pâte d'arachide diluée dans un peu d'eau chaude, bien mélanger.",
-              "Ajouter les crevettes séchées réhydratées et hachées.",
-              "Incorporer les feuilles de ndolé hachées et laisser mijoter à feu doux pendant 15-20 minutes.",
-              "Assaisonner avec du sel, du poivre et du piment selon votre goût.",
-              "Servir chaud avec du riz, des plantains frits ou du miondo."
-            ],
-            tempsPreparation: 45,
-            tempsCuisson: 40,
-            difficulte: "Moyen",
-            typeCuisine: "Camerounaise",
-            regimeAlimentaire: [],
-            calories: 450,
-            noteMoyenne: 4.8,
-            nombreAvis: 24,
-            auteur: { 
-              nom: "Mbarga", 
-              prenom: "Pierre",
-              _id: "123" 
-            },
-            dateCreation: "2023-05-15T14:32:21Z"
-          };
-          
-          setRecipe(fallbackRecipe);
-          
-          // Commentaires de fallback
-          const fallbackComments = [
-            {
-              _id: '1',
-              contenu: "J'ai adoré cette recette ! Les instructions sont claires et le résultat est délicieux.",
-              dateCreation: "2023-06-10T09:15:00Z",
-              utilisateur: {
-                _id: "456",
-                nom: "Dupont",
-                prenom: "Jean"
-              }
-            },
-            {
-              _id: '2',
-              contenu: "Super recette traditionnelle ! J'ai ajouté un peu plus de piment pour plus de saveur.",
-              dateCreation: "2023-07-22T14:30:00Z",
-              utilisateur: {
-                _id: "789",
-                nom: "Kamga",
-                prenom: "Marie"
-              }
-            }
-          ];
-          
-          setComments(fallbackComments);
-          setIsFavorite(false);
-          setUserRating(0);
-        }
+      // Aucune donnée récupérée, afficher un message d'erreur
+      setError('Impossible de charger les détails de cette recette.');
+      setRecipe(null);
+      setComments([]);
+    }
         
       } catch (err) {
         console.error('Erreur lors du chargement de la recette:', err);
@@ -514,13 +451,32 @@ export default function RecipeDetail() {
       {/* Image et description */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-12">
         <div className="lg:col-span-3 relative h-[400px] rounded-xl overflow-hidden">
-          <SafeImage 
-            src={recipe.photo ? `http://localhost:5000/uploads/${recipe.photo}` : recipe.image || '/images/default-recipe.svg'} 
-            fallbackSrc="/images/default-recipe.svg"
-            alt={recipe.titre} 
-            fill
-            className="object-cover"
-          />
+          <div className="w-full h-full">
+            {/* Si nous avons une URL d'image valide de l'API, utiliser SafeImage */}
+            {getRecipeImageUrl(recipe.photo) ? (
+              <SafeImage 
+                src={getRecipeImageUrl(recipe.photo)}
+                alt={recipe.titre} 
+                fill
+                className="object-cover" 
+                priority
+              />
+            ) : recipe.image && recipe.image.startsWith('/') ? (
+              /* Si nous avons une image locale statique */
+              <Image 
+                src={recipe.image}
+                alt={recipe.titre} 
+                fill
+                className="object-cover" 
+                priority
+              />
+            ) : (
+              /* Si nous n'avons pas d'image, afficher un placeholder */
+              <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                <span className="text-gray-400 text-lg font-medium">Aucune image disponible pour cette recette</span>
+              </div>
+            )}
+          </div>
         </div>
         <div className="lg:col-span-2">
           <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl h-full">
@@ -547,6 +503,30 @@ export default function RecipeDetail() {
       </div>
       
       {/* Ingrédients et étapes de préparation */}
+      {/* Détails de la recette (affichage complet) */}
+      <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg mb-8">
+        <h2 className="text-xl font-semibold mb-2">Détails complets de la recette</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p><strong>ID:</strong> {recipe._id}</p>
+            <p><strong>Titre:</strong> {recipe.titre}</p>
+            <p><strong>Auteur:</strong> {recipe.auteur ? `${recipe.auteur.prenom || ''} ${recipe.auteur.nom || ''}`.trim() : 'Non spécifié'}</p>
+            <p><strong>Date de création:</strong> {recipe.dateCreation ? new Date(recipe.dateCreation).toLocaleDateString() : 'Non spécifiée'}</p>
+            <p><strong>Difficulté:</strong> {recipe.difficulte || 'Non spécifiée'}</p>
+            <p><strong>Type de cuisine:</strong> {recipe.typeCuisine || 'Non spécifié'}</p>
+            <p><strong>Temps de préparation:</strong> {recipe.tempsPreparation ? `${recipe.tempsPreparation} min` : 'Non spécifié'}</p>
+            <p><strong>Temps de cuisson:</strong> {recipe.tempsCuisson ? `${recipe.tempsCuisson} min` : 'Non spécifié'}</p>
+          </div>
+          <div>
+            <p><strong>Calories:</strong> {recipe.calories ? `${recipe.calories} kcal` : 'Non spécifié'}</p>
+            <p><strong>Note moyenne:</strong> {recipe.noteMoyenne ? recipe.noteMoyenne : 'Aucune'}</p>
+            <p><strong>Nombre d'avis:</strong> {recipe.nombreAvis || 0}</p>
+            <p><strong>Régimes alimentaires:</strong> {Array.isArray(recipe.regimeAlimentaire) && recipe.regimeAlimentaire.length > 0 ? recipe.regimeAlimentaire.join(', ') : 'Aucun'}</p>
+            <p><strong>Nom de fichier photo:</strong> {recipe.photo || 'Aucune photo'}</p>
+          </div>
+        </div>
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
         <div className="md:col-span-1">
           <div className="bg-white dark:bg-gray-800 shadow-md rounded-xl p-6">
@@ -607,15 +587,26 @@ export default function RecipeDetail() {
       
       {/* Commentaires */}
       <div className="bg-white dark:bg-gray-800 shadow-md rounded-xl p-6">
-        <h2 className="text-xl font-semibold mb-4 flex items-center">
-          <FiMessageCircle className="mr-2" />
-          Commentaires
-          <span className="ml-2 text-gray-500 dark:text-gray-400 text-sm font-normal">
-            ({comments.length})
-          </span>
-        </h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold flex items-center">
+            <FiMessageCircle className="mr-2" />
+            Commentaires
+            <span className="ml-2 text-gray-500 dark:text-gray-400 text-sm font-normal">
+              ({comments.length})
+            </span>
+          </h2>
+          <button 
+            onClick={() => setShowComments(!showComments)}
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            aria-label={showComments ? 'Masquer les commentaires' : 'Afficher les commentaires'}
+          >
+            {showComments ? 
+              <FiEyeOff className="text-gray-500 dark:text-gray-400" size={20} /> : 
+              <FiEye className="text-amber-500" size={20} />}
+          </button>
+        </div>
         
-        {isLoggedIn ? (
+        {showComments && isLoggedIn ? (
           <form onSubmit={handleAddComment} className="mb-6">
             <div className="mb-3">
               <textarea
@@ -639,7 +630,7 @@ export default function RecipeDetail() {
               </button>
             </div>
           </form>
-        ) : (
+        ) : showComments ? (
           <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-6 text-center">
             <p className="text-gray-700 dark:text-gray-300 mb-2">
               Connectez-vous pour laisser un commentaire
@@ -648,27 +639,35 @@ export default function RecipeDetail() {
               Se connecter <FiChevronRight className="inline ml-1" />
             </Link>
           </div>
-        )}
+        ) : null}
         
-        <div className="divide-y divide-gray-200 dark:divide-gray-700">
-          {comments.length > 0 ? (
-            comments.map((comment) => 
-              comment && comment._id ? (
-                <CommentItem
-                  key={comment._id}
-                  comment={comment}
-                  isCurrentUser={isLoggedIn && user?.id && comment.utilisateur && user.id === comment.utilisateur._id}
-                  onDelete={handleDeleteComment}
-                  onEdit={handleEditComment}
-                />
-              ) : null
-            )
-          ) : (
-            <p className="py-4 text-gray-500 dark:text-gray-400 text-center">
-              Aucun commentaire pour le moment. Soyez le premier à donner votre avis !
-            </p>
-          )}
-        </div>
+        {showComments && (
+          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            {comments.length > 0 ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                {comments.map((comment) => 
+                  comment && comment._id ? (
+                    <CommentItem
+                      key={comment._id}
+                      comment={comment}
+                      isCurrentUser={isLoggedIn && user?.id && comment.utilisateur && user.id === comment.utilisateur._id}
+                      onDelete={handleDeleteComment}
+                      onEdit={handleEditComment}
+                    />
+                  ) : null
+                )}
+              </motion.div>
+            ) : (
+              <p className="py-4 text-gray-500 dark:text-gray-400 text-center">
+                Aucun commentaire pour le moment. Soyez le premier à donner votre avis !
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

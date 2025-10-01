@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "SaveursDuKmer - Plateforme de partage de recettes camerounaises",
+  title: "𝓛𝓪 𝓑𝓸𝓷𝓳𝓸𝓾𝓻𝓷𝓪𝓲𝓼𝓮",
   description: "Découvrez, partagez et notez des délicieuses recettes de cuisine camerounaise",
   keywords: "recettes, cuisine camerounaise, partage de recettes, cuisine africaine"
 };
