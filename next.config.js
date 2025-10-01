@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['localhost', '127.0.0.1'],
+    domains: ['localhost', '127.0.0.1', 'vercel.app', 'la-bonjournaise.vercel.app'],
     remotePatterns: [
       {
         protocol: 'http',
@@ -15,6 +15,11 @@ const nextConfig = {
         hostname: '127.0.0.1',
         port: '5000',
         pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.vercel.app',
+        pathname: '/**',
       }
     ],
     dangerouslyAllowSVG: true,

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { FiSearch, FiFilter, FiX } from 'react-icons/fi';
@@ -43,7 +43,7 @@ const fallbackRecettes = [
   }
 ];
 
-export default function RecipesPage() {
+function RecipesList() {
   const searchParams = useSearchParams();
   
   const [recipes, setRecipes] = useState([]);
@@ -256,5 +256,13 @@ export default function RecipesPage() {
         </>
       )}
     </div>
+  );
+}
+
+export default function RecipesPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 pt-24 pb-12 flex justify-center items-center min-h-[50vh]">Chargement des recettes...</div>}>
+      <RecipesList />
+    </Suspense>
   );
 }
